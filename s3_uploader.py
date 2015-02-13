@@ -95,11 +95,13 @@ def CopyAndAppendTimeDateToFilename(filename):
 
 def main(argv):
     current_py_filename = os.path.basename(__file__) 
-    help_text = current_py_filename + ' -i <inputFile> -b <bucketName>'
+    help_text = current_py_filename + ' -i <inputFile> -b <bucketName> -k'
     inputFile = ''
     bucketName = ''
+    keep_file = False
+
     try:
-        opts, args = getopt.getopt(argv,"hi:b:",["ifile=","bname="])
+        opts, args = getopt.getopt(argv,"hi:b:k",["ifile=","bname="])
     except getopt.GetoptError:
         print help_text
         sys.exit(2)
@@ -111,9 +113,12 @@ def main(argv):
             inputFile = arg
         elif opt in ("-b", "--bname"):
             bucketName = arg
-    
-    print 'Input file is:', inputFile
-    print 'Bucket name is:', bucketName
+        elif opt in ("-k:"):
+            keep_file = True
+
+    #print 'Input file is:', inputFile
+    #print 'Bucket name is:', bucketName
+    #print 'Keep is:', keep_file 
 
     if not (inputFile):
       print "Error: missing required input parameters"
@@ -133,6 +138,11 @@ def main(argv):
 
     #upload the file to bucket
     UploadFileToS3Bucket(timedate_logfile, bucketName)
+
+    #user does NOT want to keep the original so delete it
+    if not keep_file:
+        print bcolors.HEADER + 'Info: ' + bcolors.ENDC + 'Deleting original file ' + bcolors.WARNING + inputFile + bcolors.ENDC
+        os.remove(inputFile)
 
 #END
 

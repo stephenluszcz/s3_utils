@@ -13,16 +13,16 @@ import getopt   #used by main
 def DownloadFileFromS3Bucket(filename, the_bucket):
 
     # boto is using creds set from ~/.aws/credentials
+    # to use a certain profile add parameter profile_name="" 
     s3_conn = boto.connect_s3()
 
-    #bucket_name = "corista-misc"
     bucket_name = the_bucket
 
     #get a connection to a bucket
     bucket = s3_conn.create_bucket(bucket_name)
 
     #get list of keys in the bucket
-    bucket_list = bucket.list()
+    #bucket_list = bucket.list()
 
     #download_file = "test_script_download.sh"
     download_file = filename
@@ -72,8 +72,8 @@ def main(argv):
         elif opt in ("-b", "--bname"):
             bucketName = arg
     
-    print 'Download file is:', downloadFile
-    print 'Bucket name is:', bucketName
+    #print 'Download file is:', downloadFile
+    #print 'Bucket name is:', bucketName
 
     if not (downloadFile):
       print "Error: missing required input parameters"
