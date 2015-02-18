@@ -56,33 +56,44 @@ def UploadFileToS3Bucket(my_file, the_bucket):
 #///////////////////////////////////////////////////////////////////////
 def CopyAndAppendTimeDateToFilename(filename):
     #save current date / time
-    current_date_time = time.strftime("%Y-%d-%m_%H:%M:%S")
+    #do no use : in filenames, not allowed in Windows filenames
+    current_date_time = time.strftime("%Y-%m-%d_%H%M%S")
 
     #print "filename (full path): " + filename
 
-    # need to remove the path info from the filename
-    if '/' in filename:
+    #filename will include path info...we just want the filename
+    just_filename = filename
+
+    # need to remove the path info from the filename (for Linux)
+    if '/' in just_filename:
         tmp_file = filename.rsplit('/', 1)[1]
-        filename = tmp_file
+        just_filename = tmp_file
+
+    # need to remove the path info from the filename (for Windows)
+    # just looking for a single \ but need escape sequence
+    if '\\' in filename:
+        tmp_file = filename.rsplit('\\', 1)[1]
+        just_filename = tmp_file
 
     #print "filename (path extracted): " + filename
 
     # if no extension on the filename don't worry about adding it
-    if not '.' in filename: 
+    if not '.' in just_filename: 
         #create log file based on current date / time
-        timedate_log_filename = filename + "_" + current_date_time
+        timedate_log_filename = just_filename + "_" + current_date_time
       
     else:
-        #saves everything to the left of the last .
-        tmp_name = filename.rsplit('.', 1)[0]
+        #save everything to the left of the last .
+        tmp_name = just_filename.rsplit('.', 1)[0]
 
         #save everything to the right of the last .
-        ext = filename.rsplit('.', 1)[1]
+        ext = just_filename.rsplit('.', 1)[1]
       
         #create log file based on current date / time and add the file extension
         timedate_log_filename = tmp_name + "_" + current_date_time + "." + ext
 
-    #copy log file to time / date stamped log file
+    #copy file to time / date stamped file
+    #file will be copied to cwd (current working directory)
     shutil.copyfile(filename, timedate_log_filename)
 
     return timedate_log_filename
